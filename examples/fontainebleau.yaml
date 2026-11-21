@@ -1,0 +1,14 @@
+# Andrä et al. (2013) Fontainebleau sandstone, ExxonMobil segmentation, 288 x 288 x 300 voxels, 7.5 um
+name: fontainebleau_exxon
+output: out/fontainebleau_exxon
+input:
+  path: data/segmented-exxon.raw.gz
+  format: raw
+  shape: [300, 288, 288]   # z, y, x
+  dtype: uint8
+  voxel_size: 7.5
+binary: {pore_value: 0}
+morphometrics: {pore_sizes: true}
+rve: {eps_rel: 0.05, windows: [8, 12, 16, 24, 32, 48, 64, 96, 144]}
+properties: {subvolume: 144, axes: [0], mirror: true, permeability: true, formation_factor: true, tol: 0.0001}
+network: {axes: [0, 1, 2], geometry: spheres_and_cylinders}

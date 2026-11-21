@@ -1,0 +1,12 @@
+# Template for a grey-scale scan (e.g. one of Dr Amao's core plugs)
+name: my_core_plug
+output: out/my_core_plug
+input:
+  path: /path/to/stack_folder_or_file.tif   # or .raw with shape/dtype, .nii.gz, .nrrd, .npy
+  voxel_size: 5.0                            # micrometres
+  crop: [[0, 400], [100, 500], [100, 500]]   # z, y, x
+preprocess: {denoise: nlm, h: 0.8}
+segment: {method: otsu, pore: dark, min_size: 27}
+rve: {eps_rel: 0.05}
+properties: {subvolume: 160, axes: [0], mirror: true}
+network: {axes: [0, 1, 2]}

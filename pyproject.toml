@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "morphoct"
+version = "0.1.0.dev0"
+description = "morphoCT: scientifically grounded microCT analysis of rocks, core plugs and foraminifera, built on morphoGen and PoreSpy"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [{ name = "Abduljamiu O. Amao" }]
+requires-python = ">=3.12"
+dependencies = [
+  "morphogen[io]==1.0.2",
+  "porespy==3.3.0",
+  "openpnm==3.6.5",
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "scikit-image>=0.22",
+  "tifffile>=2024.1.0",
+  "matplotlib>=3.8",
+  "PyYAML>=6.0",
+  "PyWavelets>=1.5",
+]
+
+[project.optional-dependencies]
+itk = ["SimpleITK>=2.3"]
+test = ["pytest>=8"]
+
+[project.scripts]
+morphoct = "morphoct.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["slow: long-running tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
