@@ -4,7 +4,7 @@ Scientifically grounded microCT analysis of **rocks, core plugs and foraminifera
 built on [morphoGen](https://github.com/jdirr/morphoGen) (Dirrenberger, GPL-3.0-or-later)
 and [PoreSpy](https://github.com/PMEAL/porespy) / [OpenPNM](https://github.com/PMEAL/OpenPNM) (MIT).
 
-Status: **0.1.0.dev0, Phase 1 MVP** (rock and core). The foraminifera module is an API stub.
+Status: **0.1.0.dev0, Phase 1 MVP** (rock and core). The foraminifera module has a baseline shell segmentation and volume/surface/density-proxy path; chamber labelling remains a stub.
 Licence: **GPL-3.0-or-later** (see `LICENSE`), as required by the morphoGen dependency.
 
 ## Pipeline
@@ -23,7 +23,7 @@ import -> preprocess -> segment (+QC) -> morphometrics -> REV -> properties -> n
 | `morphoct.properties` | permeability by lattice Boltzmann (TRT D3Q19), formation factor and Archie m by FFT conduction, Kozeny-Carman check | morphoGen `homogenization` |
 | `morphoct.network` | SNOW2 pore network, OpenPNM Stokes flow permeability | PoreSpy, OpenPNM |
 | `morphoct.report` | `results.json`, one-page `report.html` (figures embedded) and `report.pdf` | matplotlib |
-| `morphoct.foram` | planned API: test segmentation, interior separation, chamber watershed, wall thickness, density index (generic helpers implemented) | (Phase 3) |
+| `morphoct.foram` | Otsu shell segmentation, calcite volume, filled test volume, surface area, density proxies; chamber watershed and ambient-occlusion interior remain stubs | (Phase 3 starting point) |
 
 ## Install and run
 
@@ -49,8 +49,12 @@ is reported in mD (1 mD = 9.869233e-4 um^2), lengths in um, S_V per um.
 `benchmarks/run_benchmarks.py` downloads the public Andrä et al. (2013) digital rock
 physics benchmark images from https://github.com/fkrzikalla/drp-benchmarks and compares
 morphoCT with the published values (Andrä et al. 2013, Part I, doi:10.1016/j.cageo.2012.09.005;
-Part II, doi:10.1016/j.cageo.2012.09.008). Results: `benchmarks/RESULTS.md`.
-The benchmark images are not redistributed here.
+Part II, doi:10.1016/j.cageo.2012.09.008).
+
+`benchmarks/run_public_data.py` runs the same pipeline on public carbonate and
+foraminifera volumes (Imperial College 2015 Estaillades and Ketton; Siccha et al.
+2023 planktic foram microCT, doi:10.1594/PANGAEA.949585). Results for both
+benchmarks: `benchmarks/RESULTS.md`. The images are not redistributed here.
 
 ## Where a morphoGen fork patch would be needed
 

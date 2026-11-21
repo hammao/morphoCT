@@ -1,0 +1,18 @@
+# Imperial College Pore-Scale Modelling 2015 release, Estaillades carbonate,
+# 1000^3 at 3.31136 um, already segmented (0 = pore, 1 = solid).
+# The volume is not in the repository; point path at your copy of
+# Estaillades_1000c_3p31136um.raw.gz (see benchmarks/RESULTS.md).
+name: estaillades_2015
+output: out/estaillades
+input:
+  path: /workspace/morphoCT_data/carbonate/ImagesICPSC2015/Estaillades_1000c_3p31136um.raw.gz
+  format: raw
+  shape: [1000, 1000, 1000]   # z, y, x
+  dtype: uint8
+  voxel_size: 3.31136
+  # optional centre crop, to keep memory down:
+  # crop: [[300, 700], [300, 700], [300, 700]]
+binary: {pore_value: 0}
+morphometrics: {pore_sizes: false}
+rve: {eps_rel: 0.05, windows: [8, 12, 16, 24, 32, 48, 64, 96, 128, 160]}
+properties: {subvolume: 144, axes: [2], mirror: true, permeability: true, formation_factor: true, tol: 0.0001}

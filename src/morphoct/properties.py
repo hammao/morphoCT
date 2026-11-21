@@ -71,8 +71,11 @@ def formation_factor(binary: np.ndarray, voxel_size: float, *, axes=(0,), mirror
         m = _MG_AXIS[a]
         sig = float(tens[m, m])
         F = 1.0 / sig if sig > 0 else float("inf")
-        res["axes"][_NAMES[a]] = {"sigma_eff": sig, "F": F, "tortuosity_factor": F * phi,
-                                  "seconds": round(time.time() - t0, 1)}
+        axis = {"sigma_eff": sig, "F": F, "tortuosity_factor": F * phi,
+                "seconds": round(time.time() - t0, 1)}
+        if sig <= 0:
+            axis["note"] = "non-positive effective conductivity; the subvolume may not percolate along this axis"
+        res["axes"][_NAMES[a]] = axis
     res["mean_F"] = float(np.mean([v["F"] for v in res["axes"].values()]))
     # Archie cementation exponent from F = phi^-m
     res["archie_m"] = float(np.log(res["mean_F"]) / -np.log(phi)) if 0 < phi < 1 else float("nan")

@@ -9,3 +9,6 @@ benchmarks/bench.log
 *.npz
 *.raw
 *.raw.gz
+benchmarks/out_public/
+benchmarks/public.log
+benchmarks/bench2.log
