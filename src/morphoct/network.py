@@ -65,7 +65,16 @@ def permeability(binary: np.ndarray, voxel_size: float, *, axes=(0, 1, 2), snow_
     trim = list(h["disconnected_pores"]) + list(h["isolated_pores"])
     if trim:
         op.topotools.trim(network=pn, pores=np.unique(trim))
-    _prepare(pn, geometry, pore_diameter, throat_diameter)
+    try:
+        _prepare(pn, geometry, pore_diameter, throat_diameter)
+    except Exception as e:  # e.g. "The pores overlap too much" for spheres on tight networks
+        if geometry == "cones_and_cylinders":
+            raise
+        fallback = f"{geometry} failed ({str(e)[:60]}); used cones_and_cylinders"
+        geometry = "cones_and_cylinders"
+        _prepare(pn, geometry, pore_diameter, throat_diameter)
+    else:
+        fallback = None
     water = op.phase.Water(network=pn)
     water.add_model_collection(op.models.collections.physics.basic)
     water.regenerate_models()
@@ -91,5 +100,7 @@ def permeability(binary: np.ndarray, voxel_size: float, *, axes=(0, 1, 2), snow_
         k = Q * mu * L / (A * 1.0)
         res["axes"][_NAMES[a]] = {"k_m2": k, "k_mD": k * 1e12 / UM2_PER_MD}
     res["mean_mD"] = float(np.mean([v["k_mD"] for v in res["axes"].values()]))
+    if fallback:
+        res["fallback"] = fallback
     res["seconds"] = round(time.time() - t0, 1)
     return res

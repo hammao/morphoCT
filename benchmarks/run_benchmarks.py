@@ -132,23 +132,28 @@ def main() -> None:
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--skip-berea", action="store_true")
     ap.add_argument("--sensitivity", action="store_true")
+    ap.add_argument("--reuse", action="store_true", help="reuse an existing Fontainebleau results.json")
     a = ap.parse_args()
     data, out = Path(a.data), Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     summary = {"published": PUBLISHED}
-    f = fontainebleau(data, out, a.quick)
+    from morphoct.report import write_json
+
+    prev = out / "fontainebleau" / "results.json"
+    f = json.loads(prev.read_text()) if a.reuse and prev.exists() else fontainebleau(data, out, a.quick)
     summary["fontainebleau"] = {k: f[k] for k in ("morphometrics", "rve", "permeability", "formation_factor", "network",
                                                   "kozeny_carman_mD", "properties_subvolume", "timings_s", "total_seconds") if k in f}
     if a.sensitivity:
         b = np.load(out / "fontainebleau" / "binary.npz")["data"].astype(np.uint8)
         summary["fontainebleau_network_sensitivity"] = network_sensitivity(b, 7.5)
+    write_json(summary, out / "benchmark_summary.json")
     if not a.skip_berea:
         seg, sub = berea_seg(data, out)
         summary["berea_grey_segmentation"] = seg
+        write_json(summary, out / "benchmark_summary.json")
         summary["berea_sub400"] = berea_sub400(sub, out)
     summary["total_seconds"] = round(time.time() - t0, 1)
-    from morphoct.report import write_json
 
     write_json(summary, out / "benchmark_summary.json")
     print(json.dumps({"total_seconds": summary["total_seconds"]}))
