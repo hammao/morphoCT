@@ -4,7 +4,7 @@ Scientifically grounded microCT analysis of **rocks, core plugs and foraminifera
 built on [morphoGen](https://github.com/jdirr/morphoGen) (Dirrenberger, GPL-3.0-or-later)
 and [PoreSpy](https://github.com/PMEAL/porespy) / [OpenPNM](https://github.com/PMEAL/OpenPNM) (MIT).
 
-Status: **0.1.0.dev0, Phase 1 MVP** (rock and core), with a Phase 3 starting point for foraminifera: chamber counting, wall-thickness maps, and calibrated or relative CT density.
+Status: **0.1.0.dev0, Phase 1 MVP** (rock and core), with a Phase 3 starting point for foraminifera (chamber counting, wall-thickness maps, calibrated or relative CT density) and a FIB-SEM stack path (registration, curtaining/shading correction, anisotropic voxels).
 Licence: **GPL-3.0-or-later** (see `LICENSE`), as required by the morphoGen dependency.
 
 ## Pipeline
@@ -24,6 +24,7 @@ import -> preprocess -> segment (+QC) -> morphometrics -> REV -> properties -> n
 | `morphoct.network` | SNOW2 pore network, OpenPNM Stokes flow permeability | PoreSpy, OpenPNM |
 | `morphoct.report` | `results.json`, one-page `report.html` (figures embedded) and `report.pdf` | matplotlib |
 | `morphoct.foram` | Otsu shell segmentation, calcite volume, filled test volume, surface area; chamber labelling (exterior-erosion plus convex-hull enclosure, EDT/watershed); Hildebrand wall-thickness maps; Iwasaki relative CT and two-point density calibration (uncalibrated outputs are flagged) | scikit-image, PoreSpy |
+| `morphoct.fibsem` | Load a serial-section frame stack with anisotropic voxel size from Atlas/FEI/text sidecars (nm converted to um); phase-correlation drift correction; Fourier curtaining (vertical stripe) and shading correction; milled-window crop; optional isotropic resampling; then the existing pipeline | scikit-image, SciPy |
 
 ## Install and run
 
@@ -32,11 +33,16 @@ python -m venv .venv && . .venv/bin/activate
 pip install -e ".[itk,test]"
 morphoct run examples/fontainebleau.yaml
 morphoct foram examples/foram.yaml
+morphoct fibsem examples/fibsem.yaml
 pytest -q              # fast tests
 pytest -q -m slow      # end-to-end and network tests
 ```
 
 `morphoct foram` accepts a YAML config or flags (`--input`, `--shape` as Z,Y,X for RAW, `--voxel-size`, `--output`, `--close-radius`, `--air-grey`, `--calcite-grey`). Without a calcite standard the density is reported as an uncalibrated mean grey value and shell mass is omitted.
+
+`morphoct fibsem` prepares a FIB-SEM serial-section stack (anisotropic voxels, slice registration, curtaining and shading correction, milled-region crop) and then runs the same morphometrics / REV / properties pipeline. Voxel sizes in metadata are converted from nm to um. See `examples/fibsem.yaml`.
+
+Unpublished raw FIB-SEM or microCT stacks, and any figures or numeric results derived from them, are not part of this public repository. They stay in a local private results folder (and, when staged, under Harbor_Sync_Folder).
 
 A config (`examples/*.yaml`) names the input, whether it is already segmented
 (`binary: {pore_value: 0}`) or grey (then `preprocess` and `segment` run), the REV
@@ -91,6 +97,7 @@ optional. Patches worth upstreaming (or carrying in `hammao/morphoGen`) are:
 * Hildebrand and Ruegsegger 1997, local thickness: doi:10.1046/j.1365-2818.1997.1340694.x
 * Iwasaki et al. 2015, relative CT number of planktic tests: doi:10.1002/2014PA002639
 * Todd, Schmidt, Robinson and De Schepper 2019, microCT calcite volume and test thickness: doi:10.1029/2019PA003738
+* Muench, Trtik, Marone and Stampanoni 2009, stripe artefact removal: doi:10.1364/OE.17.008567
 
 ## Licences of what morphoCT uses
 

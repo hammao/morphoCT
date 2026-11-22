@@ -161,3 +161,11 @@ Per-chamber volumes (um^3), growth-path order starting at the smallest chamber:
 * Discrete local thickness is quantized at 2 * voxel_size; thin walls (a few voxels) have a coarse histogram.
 * No calcite standard was scanned with these specimens, so g/cm^3 and shell mass are not reported here. The calibration path is covered by the phantom tests.
 * Full ambient occlusion (Titschack et al. 2018 / MFSE) is still a stub.
+
+## FIB-SEM stack support
+
+morphoCT can now load a serial-section image stack (a folder of TIFF/PNG frames or a multi-page TIFF) with anisotropic voxel size taken from an Atlas/FEI XML or a simple text sidecar (lengths converted to micrometres). The preparation step registers slices by phase correlation, attenuates vertical curtaining with a Fourier notch (Muench et al. 2009), subtracts a slow shading field, crops the milled window from the unmilled frame, and optionally resamples to isotropic voxels so the existing segmentation, morphometrics, REV and transport pipeline can run. CLI: `morphoct fibsem examples/fibsem.yaml`.
+
+Validation in the public repository is on synthetic stacks only (`tests/test_fibsem.py`): voxel-size XML/text parsing, recovery of known slice shifts, reduction of planted vertical stripes, milled-window crop, isotropic resampling, and an end-to-end `morphoct fibsem` run on a 16^3 phantom. Fast tests: 34 passed (2 slow deselected).
+
+Unpublished FIB-SEM datasets and any figures or numbers derived from them are kept out of this public repository (private results folder and, when staged, Harbor_Sync_Folder).

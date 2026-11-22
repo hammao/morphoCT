@@ -1,0 +1,28 @@
+# FIB-SEM stack. Point input.path at a folder of TIFF/PNG frames or a multi-page TIFF.
+# voxel_size is [dz, dy, dx] in micrometres (1 nm = 0.001 um). If omitted, a sidecar
+# .xml/.txt/.a3d in the folder is parsed when present.
+name: fibsem_example
+output: morphoct_out/fibsem_example
+input:
+  path: /workspace/morphoCT_data/fibsem/STACK_FOLDER
+  # voxel_size: [0.010, 0.005, 0.005]
+fibsem:
+  register: true
+  curtaining: true
+  shading: true
+  crop_milled: true
+  isotropic: true
+  # max_frames: 200
+preprocess:
+  denoise: median
+  size: 3
+segment:
+  method: otsu
+  pore: dark
+rve:
+  windows: [16, 24, 32, 48, 64]
+properties:
+  subvolume: 96
+  axes: [0]
+  mirror: true
+  max_steps: 20000

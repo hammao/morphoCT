@@ -1,4 +1,4 @@
-"""Command line: ``morphoct run config.yaml`` and ``morphoct foram``."""
+"""Command line: ``morphoct run config.yaml``, ``morphoct foram``, and ``morphoct fibsem``."""
 
 from __future__ import annotations
 
@@ -97,11 +97,21 @@ def main(argv=None) -> int:
     f.add_argument("--calcite-density", type=float, dest="calcite_density",
                    help="density of the calcite standard in g/cm3 (default 2.71)")
     f.add_argument("--density-method", dest="density_method", choices=("iwasaki_ct", "linear"))
+    s = sub.add_parser("fibsem", help="prepare a FIB-SEM stack and run the morphoCT pipeline")
+    s.add_argument("config", help="YAML config (input.path to a frame folder or TIFF, fibsem: options, then pipeline keys)")
     a = p.parse_args(argv)
     if a.cmd == "version":
         from morphoct.pipeline import _versions
 
         print(json.dumps(_versions()))
+        return 0
+    if a.cmd == "fibsem":
+        from morphoct.fibsem import run_config
+
+        payload = run_config(a.config)
+        out = payload.get("config", {}).get("output", "")
+        phi = (payload.get("morphometrics") or {}).get("porosity")
+        print(f"done: fibsem {payload.get('name')}: porosity {phi}; report in {out}")
         return 0
     if a.cmd == "foram":
         from morphoct.foram import run_config

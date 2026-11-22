@@ -14,3 +14,6 @@ benchmarks/public.log
 benchmarks/bench2.log
 benchmarks/results/foram_siccha/**/*.npy
 benchmarks/results/foram_siccha_run.log
+
+# Unpublished FIB-SEM and other private data: never commit raw stacks or derived numbers/figures
+benchmarks/results/fibsem_private/
