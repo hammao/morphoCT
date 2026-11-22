@@ -1,0 +1,267 @@
+{
+  "dataset": "Siccha et al. 2023, PANGAEA 949585, CC-BY-4.0",
+  "doi": "10.1594/PANGAEA.949585",
+  "specimens": [
+    {
+      "name": "CA_GGL_1",
+      "species": "Globigerinita glutinata",
+      "elapsed_s": 23.486427783966064,
+      "literature": {
+        "final_whorl_chambers": "3-3.5",
+        "source": "Pearson et al. 2018 / Mikrotax diagnosis of G. glutinata: 3 to 3.5 chambers in the final whorl. Total chamber number is not published for this specimen."
+      },
+      "n_chambers": 5,
+      "chamber_volumes_um3": [
+        65170.58071168615,
+        70080.40776455782,
+        205836.25831584973,
+        404116.9347181814,
+        930662.0551748772
+      ],
+      "shell_volume_um3": 1075647.68661708,
+      "filled_volume_um3": 2751513.9233022323,
+      "test_porosity": 0.6090706001857551,
+      "shell_to_hull_fraction": 0.2167648200750049,
+      "surface_area_um2": 406827.0650419904,
+      "density_calibrated": false,
+      "density_method": "uncalibrated_mean_grey",
+      "density_index": 53345.6182407616,
+      "air_grey": 16013.0,
+      "shell_density_g_cm3": null,
+      "shell_mass_ug": null,
+      "wall_thickness_um": {
+        "method": "porespy.local_thickness (Hildebrand diameter)",
+        "n": 619998,
+        "mean": 6.345894813537598,
+        "median": 7.20959997177124,
+        "std": 1.644698143005371,
+        "min": 2.4031999111175537,
+        "max": 12.015999794006348,
+        "unit": "um, diameter",
+        "split_septa": true,
+        "p10": 4.806399822235107,
+        "p90": 7.20959997177124
+      },
+      "chamber_wall_thickness_um": [
+        {
+          "chamber": 1,
+          "n": 18139,
+          "mean": 5.114699363708496,
+          "median": 4.806399822235107,
+          "std": 1.9368746280670166
+        },
+        {
+          "chamber": 2,
+          "n": 10992,
+          "mean": 5.793740272521973,
+          "median": 4.806399822235107,
+          "std": 2.063310146331787
+        },
+        {
+          "chamber": 3,
+          "n": 22019,
+          "mean": 6.097660064697266,
+          "median": 7.20959997177124,
+          "std": 1.8245587348937988
+        },
+        {
+          "chamber": 4,
+          "n": 35079,
+          "mean": 6.2445244789123535,
+          "median": 7.20959997177124,
+          "std": 1.58099365234375
+        },
+        {
+          "chamber": 5,
+          "n": 60753,
+          "mean": 6.367908954620361,
+          "median": 7.20959997177124,
+          "std": 1.4977535009384155
+        }
+      ],
+      "threshold": 32331.0,
+      "notes": [
+        "Test envelope and chamber lumen use seal_method=hull_enclosure with radius 8 voxels.",
+        "test_porosity is enclosed void volume over filled test volume; calcification_fraction is shell over filled test volume; shell_to_hull_fraction is shell over the convex hull.",
+        "air_grey estimated from background median (1.601e+04).",
+        "UNCALIBRATED: no calcite (or second) standard was given. density_index is the mean shell grey value, not g/cm3. Shell mass and test bulk density are omitted.",
+        "Chamber count 5; labels follow a growth-path order starting at the smallest chamber (proloculus candidate).",
+        "Wall thickness is the Hildebrand diameter (um) from PoreSpy local thickness."
+      ]
+    },
+    {
+      "name": "GE_GTE_1",
+      "species": "Globigerinoides tenellus",
+      "elapsed_s": 35.436503648757935,
+      "literature": {
+        "final_whorl_chambers": "4",
+        "source": "Mikrotax diagnosis of G. tenellus: 4 rapidly enlarging chambers in the final whorl. Total chamber number is not published for this specimen."
+      },
+      "n_chambers": 5,
+      "chamber_volumes_um3": [
+        105105.22719595287,
+        132626.93856970716,
+        202592.72974291988,
+        580334.3156409282,
+        1332942.6785435264
+      ],
+      "shell_volume_um3": 2010747.1994456612,
+      "filled_volume_um3": 4364349.089138696,
+      "test_porosity": 0.5392790177005565,
+      "shell_to_hull_fraction": 0.27751377674763633,
+      "surface_area_um2": 606249.6023436775,
+      "density_calibrated": false,
+      "density_method": "uncalibrated_mean_grey",
+      "density_index": 48476.02473965939,
+      "air_grey": 17288.0,
+      "shell_density_g_cm3": null,
+      "shell_mass_ug": null,
+      "wall_thickness_um": {
+        "method": "porespy.local_thickness (Hildebrand diameter)",
+        "n": 1162464,
+        "mean": 10.426835060119629,
+        "median": 12.003999710083008,
+        "std": 3.9718215465545654,
+        "min": 2.4007999897003174,
+        "max": 21.607200622558594,
+        "unit": "um, diameter",
+        "split_septa": true,
+        "p10": 4.801599979400635,
+        "p90": 14.404800415039062
+      },
+      "chamber_wall_thickness_um": [
+        {
+          "chamber": 1,
+          "n": 24409,
+          "mean": 5.655340194702148,
+          "median": 4.801599979400635,
+          "std": 2.608964681625366
+        },
+        {
+          "chamber": 2,
+          "n": 18349,
+          "mean": 7.866155624389648,
+          "median": 7.202400207519531,
+          "std": 3.3918402194976807
+        },
+        {
+          "chamber": 3,
+          "n": 23270,
+          "mean": 8.30881118774414,
+          "median": 9.60319995880127,
+          "std": 3.1678125858306885
+        },
+        {
+          "chamber": 4,
+          "n": 45002,
+          "mean": 10.0572509765625,
+          "median": 12.003999710083008,
+          "std": 3.5654003620147705
+        },
+        {
+          "chamber": 5,
+          "n": 102426,
+          "mean": 8.923552513122559,
+          "median": 9.60319995880127,
+          "std": 4.569775581359863
+        }
+      ],
+      "threshold": 31634.0,
+      "notes": [
+        "Test envelope and chamber lumen use seal_method=hull_enclosure with radius 8 voxels.",
+        "test_porosity is enclosed void volume over filled test volume; calcification_fraction is shell over filled test volume; shell_to_hull_fraction is shell over the convex hull.",
+        "air_grey estimated from background median (1.729e+04).",
+        "UNCALIBRATED: no calcite (or second) standard was given. density_index is the mean shell grey value, not g/cm3. Shell mass and test bulk density are omitted.",
+        "Chamber count 5; labels follow a growth-path order starting at the smallest chamber (proloculus candidate).",
+        "Wall thickness is the Hildebrand diameter (um) from PoreSpy local thickness."
+      ]
+    },
+    {
+      "name": "CA_GUV_1",
+      "species": "Globigerinita uvula",
+      "elapsed_s": 9.77773141860962,
+      "literature": {
+        "final_whorl_chambers": "3-3.5",
+        "source": "Mikrotax diagnosis of G. uvula: 3 to 3.5 chambers in the final whorl; high trochospire, so total chambers typically exceed the final-whorl count. Total chamber number is not published for this specimen."
+      },
+      "n_chambers": 5,
+      "chamber_volumes_um3": [
+        136659.74450696193,
+        333524.7251936952,
+        185319.07996699444,
+        197201.55540343194,
+        317036.03391790285
+      ],
+      "shell_volume_um3": 432522.7998548132,
+      "filled_volume_um3": 1602263.9388437995,
+      "test_porosity": 0.730055211648261,
+      "shell_to_hull_fraction": 0.18048387435396465,
+      "surface_area_um2": 222789.0107553132,
+      "density_calibrated": false,
+      "density_method": "uncalibrated_mean_grey",
+      "density_index": 53654.87491993982,
+      "air_grey": 15811.0,
+      "shell_density_g_cm3": null,
+      "shell_mass_ug": null,
+      "wall_thickness_um": {
+        "method": "porespy.local_thickness (Hildebrand diameter)",
+        "n": 249304,
+        "mean": 4.71110200881958,
+        "median": 4.806399822235107,
+        "std": 1.3544762134552002,
+        "min": 2.4031999111175537,
+        "max": 9.612799644470215,
+        "unit": "um, diameter",
+        "split_septa": true,
+        "p10": 2.4031999111175537,
+        "p90": 7.20959997177124
+      },
+      "chamber_wall_thickness_um": [
+        {
+          "chamber": 1,
+          "n": 14967,
+          "mean": 4.998437404632568,
+          "median": 4.806399822235107,
+          "std": 1.008244276046753
+        },
+        {
+          "chamber": 2,
+          "n": 32891,
+          "mean": 5.189043998718262,
+          "median": 4.806399822235107,
+          "std": 1.1540734767913818
+        },
+        {
+          "chamber": 3,
+          "n": 20776,
+          "mean": 4.797955513000488,
+          "median": 4.806399822235107,
+          "std": 1.0529966354370117
+        },
+        {
+          "chamber": 4,
+          "n": 22512,
+          "mean": 4.564499855041504,
+          "median": 4.806399822235107,
+          "std": 1.2785499095916748
+        },
+        {
+          "chamber": 5,
+          "n": 29974,
+          "mean": 3.7588181495666504,
+          "median": 4.806399822235107,
+          "std": 1.4392279386520386
+        }
+      ],
+      "threshold": 31365.0,
+      "notes": [
+        "Test envelope and chamber lumen use seal_method=hull_enclosure with radius 8 voxels.",
+        "test_porosity is enclosed void volume over filled test volume; calcification_fraction is shell over filled test volume; shell_to_hull_fraction is shell over the convex hull.",
+        "air_grey estimated from background median (1.581e+04).",
+        "UNCALIBRATED: no calcite (or second) standard was given. density_index is the mean shell grey value, not g/cm3. Shell mass and test bulk density are omitted.",
+        "Chamber count 5; labels follow a growth-path order starting at the smallest chamber (proloculus candidate).",
+        "Wall thickness is the Hildebrand diameter (um) from PoreSpy local thickness."
+      ]
+    }
+  ]
+}

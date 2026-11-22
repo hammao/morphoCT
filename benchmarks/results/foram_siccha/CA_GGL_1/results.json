@@ -1,0 +1,164 @@
+{
+  "name": "CA_GGL_1",
+  "config": {
+    "name": "CA_GGL_1",
+    "output": "/workspace/morphoCT/benchmarks/results/foram_siccha/CA_GGL_1",
+    "input": {
+      "path": "/workspace/morphoCT_data/foram_siccha2023/CA_GGL_1_207x205x187-1.2016_um-ushort_LE.raw",
+      "shape": [
+        187,
+        205,
+        207
+      ],
+      "dtype": "uint16",
+      "byteorder": "little",
+      "voxel_size": 1.2016
+    },
+    "foram": {
+      "close_radius": 8,
+      "seal_method": "hull_enclosure",
+      "min_size": 64,
+      "largest_only": true,
+      "chambers": true,
+      "h_ratio": 0.2,
+      "smooth_sigma": 1.0,
+      "min_chamber_voxels": 80,
+      "wall_thickness_map": true
+    }
+  },
+  "voxel_size_um": 1.2016,
+  "shape_zyx": [
+    187,
+    205,
+    207
+  ],
+  "foram": {
+    "shell_volume_um3": 1075647.68661708,
+    "filled_volume_um3": 2751513.9233022323,
+    "convex_hull_volume_um3": 4962279.793579441,
+    "surface_area_um2": 406827.0650419904,
+    "test_porosity": 0.6090706001857551,
+    "calcification_fraction": 0.3909293998142449,
+    "shell_to_hull_fraction": 0.2167648200750049,
+    "close_radius_voxels": 8,
+    "density_index": 53345.6182407616,
+    "density_calibrated": false,
+    "density_method": "uncalibrated_mean_grey",
+    "shell_density_g_cm3": null,
+    "shell_mass_ug": null,
+    "test_bulk_density_g_cm3": null,
+    "relative_ct_mean": null,
+    "air_grey": 16013.0,
+    "calcite_grey": null,
+    "threshold": 32331.0,
+    "n_shell_voxels": 619998,
+    "n_chambers": 5,
+    "chamber_volumes_um3": [
+      65170.58071168615,
+      70080.40776455782,
+      205836.25831584973,
+      404116.9347181814,
+      930662.0551748772
+    ],
+    "chamber_equivalent_radius_um": [
+      24.964392025178288,
+      25.576199072233422,
+      36.627821562480015,
+      45.864093445170504,
+      60.566777314788915
+    ],
+    "chamber_centroids_um": [
+      [
+        182.41272592908103,
+        142.72067656266637,
+        86.0474703865403
+      ],
+      [
+        171.4539581522008,
+        142.62165628558697,
+        123.9531579541516
+      ],
+      [
+        139.36670140842696,
+        173.54750840757566,
+        95.85618842409582
+      ],
+      [
+        132.38490303823878,
+        115.23807810553339,
+        61.16553129295799
+      ],
+      [
+        143.3468531552172,
+        77.32554014193863,
+        138.79719055010077
+      ]
+    ],
+    "chamber_mean_grey": [
+      15406.366521137259,
+      15334.210848145764,
+      15724.810667296006,
+      15719.549295714181,
+      16045.28622240781
+    ],
+    "chamber_order": "growth_path_from_smallest",
+    "wall_thickness_um": {
+      "method": "porespy.local_thickness (Hildebrand diameter)",
+      "n": 619998,
+      "mean": 6.345894813537598,
+      "median": 7.20959997177124,
+      "std": 1.644698143005371,
+      "min": 2.4031999111175537,
+      "max": 12.015999794006348,
+      "unit": "um, diameter",
+      "split_septa": true,
+      "p10": 4.806399822235107,
+      "p90": 7.20959997177124
+    },
+    "chamber_wall_thickness_um": [
+      {
+        "chamber": 1,
+        "n": 18139,
+        "mean": 5.114699363708496,
+        "median": 4.806399822235107,
+        "std": 1.9368746280670166
+      },
+      {
+        "chamber": 2,
+        "n": 10992,
+        "mean": 5.793740272521973,
+        "median": 4.806399822235107,
+        "std": 2.063310146331787
+      },
+      {
+        "chamber": 3,
+        "n": 22019,
+        "mean": 6.097660064697266,
+        "median": 7.20959997177124,
+        "std": 1.8245587348937988
+      },
+      {
+        "chamber": 4,
+        "n": 35079,
+        "mean": 6.2445244789123535,
+        "median": 7.20959997177124,
+        "std": 1.58099365234375
+      },
+      {
+        "chamber": 5,
+        "n": 60753,
+        "mean": 6.367908954620361,
+        "median": 7.20959997177124,
+        "std": 1.4977535009384155
+      }
+    ],
+    "notes": [
+      "Test envelope and chamber lumen use seal_method=hull_enclosure with radius 8 voxels.",
+      "test_porosity is enclosed void volume over filled test volume; calcification_fraction is shell over filled test volume; shell_to_hull_fraction is shell over the convex hull.",
+      "air_grey estimated from background median (1.601e+04).",
+      "UNCALIBRATED: no calcite (or second) standard was given. density_index is the mean shell grey value, not g/cm3. Shell mass and test bulk density are omitted.",
+      "Chamber count 5; labels follow a growth-path order starting at the smallest chamber (proloculus candidate).",
+      "Wall thickness is the Hildebrand diameter (um) from PoreSpy local thickness."
+    ]
+  }
+}

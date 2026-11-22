@@ -48,12 +48,12 @@ def test_foram_helpers_and_stubs():
     assert foram.shell_volume(m, 2.0) == 216 * 8
     g = np.where(m, 150.0, 0.0)
     assert foram.density_index(g, m) == 150.0
+    # ambient occlusion remains Phase 3; closing is implemented
     with pytest.raises(NotImplementedError):
-        foram.segment_chambers(m)
-    with pytest.raises(NotImplementedError):
-        foram.separate_interior(m)
-    with pytest.raises(NotImplementedError):
-        foram.wall_thickness(m, 1.0)
+        foram.separate_interior(m, method="ambient_occlusion")
+    interior, info = foram.separate_interior(m, method="closing", close_radius=0)
+    assert info["method"] == "closing"
+    assert interior.dtype == np.uint8
 
 
 def test_hollow_cube_volumes_and_surface():
@@ -107,3 +107,138 @@ def test_aperture_needs_closing_and_hull():
     assert res.test_porosity > 0.05
     assert res.convex_hull_volume_um3 == 8**3 * vs**3
     assert 0.7 < res.shell_to_hull_fraction < 0.95
+
+
+def _ball(shape, centre, radius):
+    zz, yy, xx = np.ogrid[:shape[0], :shape[1], :shape[2]]
+    z, y, x = centre
+    return (zz - z) ** 2 + (yy - y) ** 2 + (xx - x) ** 2 <= radius ** 2
+
+
+def _cylinder_x(shape, y0, z0, x0, x1, radius):
+    zz, yy, xx = np.ogrid[:shape[0], :shape[1], :shape[2]]
+    along = (xx >= min(x0, x1)) & (xx <= max(x0, x1))
+    return along & ((yy - y0) ** 2 + (zz - z0) ** 2 <= radius ** 2)
+
+
+def multi_chamber_phantom(vs=1.0, wall=4, air=10.0, calcite=200.0):
+    """Three spherical lumens (radii 7, 6, 5) joined by thin necks, coated by a
+    uniform wall of ``wall`` voxels. Greys are constant in air and in the shell."""
+    from skimage.morphology import ball
+
+    shape = (40, 40, 52)
+    # centres along x, with a 1-voxel gap plus a neck of radius 2
+    c1, r1 = (20, 20, 12), 7
+    c2, r2 = (20, 20, 26), 6
+    c3, r3 = (20, 20, 38), 5
+    lumen = _ball(shape, c1, r1) | _ball(shape, c2, r2) | _ball(shape, c3, r3)
+    lumen |= _cylinder_x(shape, 20, 20, 12, 26, 2)
+    lumen |= _cylinder_x(shape, 20, 20, 26, 38, 2)
+    shell = ndi.binary_dilation(lumen, ball(wall)) & ~lumen
+    grey = np.full(shape, air, dtype=np.float32)
+    grey[shell] = calcite
+    truth = {
+        "n_chambers": 3,
+        "radii": (r1, r2, r3),
+        "wall_diameter_um": wall * vs,
+        "air": air,
+        "calcite": calcite,
+        "calcite_density": 2.71,
+        "voxel_size": vs,
+        "shell_voxels": int(shell.sum()),
+        "shell_volume_um3": int(shell.sum()) * vs**3,
+        "centres": (c1, c2, c3),
+    }
+    return grey, shell.astype(np.uint8), lumen.astype(np.uint8), truth
+
+
+def test_segment_chambers_on_three_chamber_phantom():
+    grey, shell, lumen, truth = multi_chamber_phantom()
+    vs = truth["voxel_size"]
+    labels, info = foram.segment_chambers(lumen, vs, smooth_sigma=0.0, h_ratio=0.25,
+                                          min_chamber_voxels=30, grey=grey)
+    assert info["n_chambers"] == 3, info
+    # growth-path order starts at the smallest chamber (radius 5)
+    vols = info["volumes_um3"]
+    assert vols[0] < vols[1] < vols[2] or vols[0] == min(vols)
+    assert abs(vols[0] - (4 / 3 * np.pi * 5**3)) / vols[0] < 0.25
+    # labels 1..3 cover the lumen
+    assert int(labels.max()) == 3
+    assert set(np.unique(labels[lumen.astype(bool)])) <= {1, 2, 3}
+
+
+def test_wall_thickness_known_diameter():
+    grey, shell, lumen, truth = multi_chamber_phantom(wall=4, vs=1.0)
+    thick, stats = foram.wall_thickness(shell, 1.0)
+    # Hildebrand diameter of a 4-voxel coating is 4 um; allow a voxel of discrete error
+    assert abs(stats["median"] - 4.0) <= 1.0, stats
+    assert abs(stats["mean"] - 4.0) <= 1.2, stats
+    assert 3.0 <= stats["max"] <= 5.0, stats
+    assert thick[shell.astype(bool)].max() > 0
+    # a spherical shell of radial thickness 4 (independent construction)
+    z, y, x = np.ogrid[:32, :32, :32]
+    r = np.sqrt((z - 16) ** 2 + (y - 16) ** 2 + (x - 16) ** 2)
+    sph = (r <= 12) & (r >= 8)
+    t2, s2 = foram.wall_thickness(sph, 1.0)
+    assert abs(s2["median"] - 4.0) <= 1.0, s2
+    assert abs(s2["max"] - 4.0) <= 1.0, s2
+
+
+def test_calibrated_and_relative_density():
+    grey, shell, lumen, truth = multi_chamber_phantom(air=10.0, calcite=200.0)
+    vs = 1.0
+    # uncalibrated: no calcite standard
+    u = foram.calibrate_shell_density(grey, shell, {"estimate_air": True}, erode=0)
+    assert u["density_calibrated"] is False
+    assert u["density_method"] == "uncalibrated_mean_grey"
+    assert abs(u["density_index"] - 200.0) < 1e-6
+    assert any("UNCALIBRATED" in n for n in u["notes"])
+    # Iwasaki two-point
+    cal = {"method": "iwasaki_ct", "air_grey": 10.0, "calcite_grey": 200.0,
+           "calcite_density_g_cm3": 2.71}
+    d = foram.calibrate_shell_density(grey, shell, cal, erode=0)
+    assert d["density_calibrated"] is True
+    assert abs(d["relative_ct_mean"] - 1000.0) < 1e-6
+    assert abs(d["shell_density_g_cm3"] - 2.71) < 1e-6
+    # linear standards, same two points
+    lin = {"method": "linear", "grey_standards": [10.0, 200.0], "density_standards": [0.0, 2.71]}
+    d2 = foram.calibrate_shell_density(grey, shell, lin, erode=0)
+    assert abs(d2["shell_density_g_cm3"] - 2.71) < 1e-6
+    # end-to-end analyse: mass and flag
+    res = foram.analyse(grey, vs, min_size=8, close_radius=0, calibration=cal,
+                        min_chamber_voxels=30, smooth_sigma=0.0, h_ratio=0.25)
+    assert res.n_chambers == 3
+    assert res.density_calibrated is True
+    assert abs(res.shell_density_g_cm3 - 2.71) < 1e-3
+    expected_mass = 2.71 * res.shell_volume_um3 * 1e-6
+    assert abs(res.shell_mass_ug - expected_mass) < 1e-9
+    assert res.test_bulk_density_g_cm3 is not None
+    un = foram.analyse(grey, vs, min_size=8, close_radius=0, calibration=None,
+                       chambers=False, wall_thickness_map=False)
+    assert un.density_calibrated is False
+    assert un.shell_mass_ug is None
+    assert any("UNCALIBRATED" in n for n in un.notes)
+
+
+def test_cli_foram_on_phantom(tmp_path):
+    grey, shell, lumen, truth = multi_chamber_phantom()
+    path = tmp_path / "ph.tif"
+    save_volume(path, Volume(grey.astype(np.uint8), 1.0))
+    out = tmp_path / "out"
+    cal = {"air_grey": 10.0, "calcite_grey": 200.0, "calcite_density_g_cm3": 2.71}
+    (tmp_path / "cal.yaml").write_text(yaml.safe_dump(cal))
+    rc = main([
+        "foram", "--input", str(path), "--voxel-size", "1.0", "--dtype", "uint8",
+        "--output", str(out), "--name", "phantom",
+        "--close-radius", "0", "--min-chamber-voxels", "30",
+        "--h-ratio", "0.25", "--smooth-sigma", "0",
+        "--calibration", str(tmp_path / "cal.yaml"),
+    ])
+    assert rc == 0
+    res = json.loads((out / "results.json").read_text())["foram"]
+    assert res["n_chambers"] == 3
+    assert res["density_calibrated"] is True
+    assert (out / "qc_chambers.png").exists()
+    assert (out / "qc_thickness.png").exists()
+    assert (out / "chamber_labels.npy").exists()
+    assert (out / "wall_thickness_um.npy").exists()

@@ -119,4 +119,45 @@ Without the 8-voxel closing, hole filling alone left almost no enclosed void (te
 * Figshare and some Imperial Box links were not downloadable from this host (HTTP 403 / 404); Digital Porous Media requires a login. The 2015 Imperial archive and the PANGAEA individual foram files were enough to run the tests.
 * The first Estaillades 144^3 (image centre of the 400^3 crop) was unrepresentative (porosity 0.057); FFT formation factor failed there (non-positive effective conductivity). The porosity-matched percolating window succeeded.
 * Ketton has no published k or F in the shipped header, so the solvers were not compared on that rock.
-* Foram chamber counts, wall-thickness maps and calibrated density (g/cm^3) remain future work.
+* Ambient-occlusion interior separation (the MFSE default of Titschack et al. 2018) is not implemented; morphoCT uses exterior erosion plus a convex-hull enclosure filter instead.
+* A last chamber with a very wide primary aperture can remain connected to the umbilicus and be discarded by the enclosure-ratio filter (see CA_GGL_1 and CA_GUV_1 below).
+
+## Foraminifera features: chambers, wall thickness and density
+
+This section updates the Siccha et al. 2023 specimens after implementing chamber labelling, Hildebrand wall-thickness maps, and density calibration. The earlier table above used a morphological closing of radius 8 plus hole filling, which left the last chambers open and understated filled test volume. The figures below use `seal_method=hull_enclosure` (default): apertures narrower than 16 voxels (~19 um) are cut from the outside, then the void inside the convex hull is watershed-split and basins with a low shell-to-void contact ratio (the umbilicus and open bays) are discarded. Chamber labels are then re-ordered along a nearest-neighbour path that starts at the smallest chamber (a proloculus candidate). Methods were reimplemented from published descriptions; no ForamJ or MFSE source was copied.
+
+Wall thickness is the Hildebrand and Ruegsegger (1997) diameter of the largest inscribed sphere, from PoreSpy `local_thickness` (which returns a radius in voxels; morphoCT reports `2 * radius * voxel_size` in um). Density uses the Iwasaki et al. (2015) relative CT number, CT = 1000 * (grey - air) / (calcite_standard - air), and an optional two-point linear fit. The Siccha 2023 scans do not include a calcite phantom, so all three runs are flagged UNCALIBRATED: `density_index` is the mean grey of an eroded shell, not g/cm^3, and shell mass is omitted. Background median grey is stored as an estimated `air_grey`. A synthetic three-chamber phantom with known count, wall diameter and density is in `tests/test_cli_foram.py`.
+
+CLI: `morphoct foram examples/foram.yaml`, or flags (`--input`, `--shape` as Z,Y,X, `--voxel-size`, `--calcite-grey`, ...). Runner: `benchmarks/run_foram_siccha.py`. QC figures and `results.json` are in `benchmarks/results/foram_siccha/`.
+
+Literature comparisons are to taxonomic diagnoses of the *final whorl*, not to a published total chamber count for these specimen IDs (the dataset paper does not report chamber counts). Pearson, Wade and Huber (2018), Atlas of Oligocene Planktonic Foraminifera, Cushman Foundation Special Publication 46, Chapter 16, p. 429-458, and the matching Mikrotax diagnoses: *Globigerinita glutinata* and *G. uvula* have 3 to 3.5 globular chambers in the final whorl; *G. uvula* is distinguished by a high to very high trochospire. Kennett and Srinivasan (1983), Neogene Planktonic Foraminifera, p. 80, and Mikrotax: *Globigerinoides tenellus* has four rapidly enlarging chambers in the final whorl.
+
+| Specimen | Chambers (morphoCT) | Final-whorl (literature) | Shell (um^3) | Filled test (um^3) | Test porosity | Wall median / mean / SD (um) | Density |
+|---|---|---|---|---|---|---|---|
+| CA_GGL_1, G. glutinata, 207 x 205 x 187 at 1.2016 um | 5 | 3 to 3.5 | 1.076e6 | 2.752e6 | 0.609 | 7.21 / 6.35 / 1.65 | UNCALIBRATED, mean grey 53346 (air ~16013, threshold 32331) |
+| GE_GTE_1, G. tenellus, 227 x 220 x 241 at 1.2004 um | 5 | 4 | 2.011e6 | 4.364e6 | 0.539 | 12.00 / 10.43 / 3.97 | UNCALIBRATED, mean grey 48476 (air ~17288, threshold 31634) |
+| CA_GUV_1, G. uvula, 152 x 180 x 138 at 1.2016 um | 5 | 3 to 3.5 (high spire) | 4.325e5 | 1.602e6 | 0.730 | 4.81 / 4.71 / 1.35 | UNCALIBRATED, mean grey 53655 (air ~15811, threshold 31365) |
+
+Per-chamber volumes (um^3), growth-path order starting at the smallest chamber:
+
+* CA_GGL_1: 6.52e4, 7.01e4, 2.06e5, 4.04e5, 9.31e5
+* GE_GTE_1: 1.05e5, 1.33e5, 2.03e5, 5.80e5, 1.33e6
+* CA_GUV_1: 1.37e5, 3.34e5, 1.85e5, 1.97e5, 3.17e5
+
+### Comparison and QC notes
+
+* CA_GGL_1: five labelled chambers, of which the mid-slice QC shows three last-whorl chambers filled and one last chamber with a wide aperture left unlabelled (it stays connected to the umbilicus and is dropped by the enclosure filter). Two smaller earlier chambers are included. The count is a total, not a final-whorl count, and is a lower bound because of the missed last chamber. Wall thickness is 5 to 8 um on the outer wall, with locally thicker septa; the histogram is stepped at 2 * voxel_size (~2.4 um), as expected for discrete local thickness. Runtime 23.5 s.
+* GE_GTE_1: mid-slice QC shows four final-whorl chambers plus one smaller earlier chamber, in agreement with the four-chamber final-whorl diagnosis. The large last chamber is recovered. Outer walls are thicker than in the two Globigerinita specimens (median 12.0 um), consistent with a macroperforate cancellate wall; local maxima reach ~22 um. Runtime 35.4 s.
+* CA_GUV_1: five labelled chambers. Mid-slice QC shows three chambers in the lower spire; the last, hook-shaped chamber remains open to the exterior and is missed. The lower heart-shaped region may fuse two chambers. Because of the high trochospire, the true total should exceed the 3 to 3.5 final-whorl figure; 5 is a lower bound. The wall is thin (median 4.81 um), as expected for this microperforate species. Runtime 9.8 s.
+
+### Unit tests
+
+`pytest tests/test_cli_foram.py -q -k "not slow"`: 8 passed. These include a three-sphere phantom with known chamber count (3), a 4-voxel wall whose Hildebrand diameter is recovered to within 1 um, Iwasaki and linear calibrations that recover 2.71 g/cm^3 and the expected mass, an explicit UNCALIBRATED flag when no standard is given, aperture closing, hollow-cube volumes, and `morphoct foram` on the phantom (QC figures and `results.json`). Ambient-occlusion interior separation still raises NotImplementedError.
+
+### Limits (feature work)
+
+* Last chambers with a primary aperture wider than the enclosure criterion can be missed (GGL, GUV). Speijer et al. 2008 already noted that closing foramina can err by about 15 %.
+* Growth-path order is a nearest-neighbour walk from the smallest chamber, not a verified ontogenetic sequence (kummerform or bullate last chambers can break volume order).
+* Discrete local thickness is quantized at 2 * voxel_size; thin walls (a few voxels) have a coarse histogram.
+* No calcite standard was scanned with these specimens, so g/cm^3 and shell mass are not reported here. The calibration path is covered by the phantom tests.
+* Full ambient occlusion (Titschack et al. 2018 / MFSE) is still a stub.

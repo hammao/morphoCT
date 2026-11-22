@@ -1,0 +1,27 @@
+# Foraminifera analysis. Edit input.path to a local volume.
+# RAW files need shape in [z, y, x] (x fastest on disk) and voxel_size in um.
+name: CA_GGL_1
+output: morphoct_out/CA_GGL_1
+input:
+  path: /workspace/morphoCT_data/foram_siccha2023/CA_GGL_1_207x205x187-1.2016_um-ushort_LE.raw
+  shape: [187, 205, 207]
+  dtype: uint16
+  byteorder: little
+  voxel_size: 1.2016
+foram:
+  close_radius: 8
+  seal_method: hull_enclosure
+  min_size: 64
+  largest_only: true
+  chambers: true
+  h_ratio: 0.2
+  smooth_sigma: 1.0
+  min_chamber_voxels: 80
+  wall_thickness_map: true
+  # Density is uncalibrated unless a calcite standard is given.
+  # air_grey may be omitted; the background median is then used.
+  # calibration:
+  #   method: iwasaki_ct
+  #   air_grey: 0
+  #   calcite_grey: 50000
+  #   calcite_density_g_cm3: 2.71

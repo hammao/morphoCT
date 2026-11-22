@@ -12,3 +12,5 @@ benchmarks/bench.log
 benchmarks/out_public/
 benchmarks/public.log
 benchmarks/bench2.log
+benchmarks/results/foram_siccha/**/*.npy
+benchmarks/results/foram_siccha_run.log

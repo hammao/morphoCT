@@ -4,7 +4,7 @@ Scientifically grounded microCT analysis of **rocks, core plugs and foraminifera
 built on [morphoGen](https://github.com/jdirr/morphoGen) (Dirrenberger, GPL-3.0-or-later)
 and [PoreSpy](https://github.com/PMEAL/porespy) / [OpenPNM](https://github.com/PMEAL/OpenPNM) (MIT).
 
-Status: **0.1.0.dev0, Phase 1 MVP** (rock and core). The foraminifera module has a baseline shell segmentation and volume/surface/density-proxy path; chamber labelling remains a stub.
+Status: **0.1.0.dev0, Phase 1 MVP** (rock and core), with a Phase 3 starting point for foraminifera: chamber counting, wall-thickness maps, and calibrated or relative CT density.
 Licence: **GPL-3.0-or-later** (see `LICENSE`), as required by the morphoGen dependency.
 
 ## Pipeline
@@ -23,7 +23,7 @@ import -> preprocess -> segment (+QC) -> morphometrics -> REV -> properties -> n
 | `morphoct.properties` | permeability by lattice Boltzmann (TRT D3Q19), formation factor and Archie m by FFT conduction, Kozeny-Carman check | morphoGen `homogenization` |
 | `morphoct.network` | SNOW2 pore network, OpenPNM Stokes flow permeability | PoreSpy, OpenPNM |
 | `morphoct.report` | `results.json`, one-page `report.html` (figures embedded) and `report.pdf` | matplotlib |
-| `morphoct.foram` | Otsu shell segmentation, calcite volume, filled test volume, surface area, density proxies; chamber watershed and ambient-occlusion interior remain stubs | (Phase 3 starting point) |
+| `morphoct.foram` | Otsu shell segmentation, calcite volume, filled test volume, surface area; chamber labelling (exterior-erosion plus convex-hull enclosure, EDT/watershed); Hildebrand wall-thickness maps; Iwasaki relative CT and two-point density calibration (uncalibrated outputs are flagged) | scikit-image, PoreSpy |
 
 ## Install and run
 
@@ -31,9 +31,12 @@ import -> preprocess -> segment (+QC) -> morphometrics -> REV -> properties -> n
 python -m venv .venv && . .venv/bin/activate
 pip install -e ".[itk,test]"
 morphoct run examples/fontainebleau.yaml
+morphoct foram examples/foram.yaml
 pytest -q              # fast tests
 pytest -q -m slow      # end-to-end and network tests
 ```
+
+`morphoct foram` accepts a YAML config or flags (`--input`, `--shape` as Z,Y,X for RAW, `--voxel-size`, `--output`, `--close-radius`, `--air-grey`, `--calcite-grey`). Without a calcite standard the density is reported as an uncalibrated mean grey value and shell mass is omitted.
 
 A config (`examples/*.yaml`) names the input, whether it is already segmented
 (`binary: {pore_value: 0}`) or grey (then `preprocess` and `segment` run), the REV
@@ -81,6 +84,13 @@ optional. Patches worth upstreaming (or carrying in `hammao/morphoGen`) are:
 * Gostick 2017, SNOW network extraction: doi:10.1103/PhysRevE.96.023307
 * Gostick et al. 2019, PoreSpy: doi:10.21105/joss.01296
 * Archie 1942, formation factor: doi:10.2118/942054-G
+* Speijer et al. 2008, foraminiferal chamber volumes from HRXCT: doi:10.1130/GES00176.1
+* Briguglio, Hohenegger and Less 2013, 3D chamber volumes: doi:10.2113/gsjfr.43.1.72
+* Trend et al. 2026, ForamJ (EDT and watershed of the lumen; local thickness): doi:10.1038/s41598-026-43276-3
+* Siccha et al. 2026, MFSE: doi:10.5334/jors.662 and doi:10.1016/j.marmicro.2026.102624
+* Hildebrand and Ruegsegger 1997, local thickness: doi:10.1046/j.1365-2818.1997.1340694.x
+* Iwasaki et al. 2015, relative CT number of planktic tests: doi:10.1002/2014PA002639
+* Todd, Schmidt, Robinson and De Schepper 2019, microCT calcite volume and test thickness: doi:10.1029/2019PA003738
 
 ## Licences of what morphoCT uses
 

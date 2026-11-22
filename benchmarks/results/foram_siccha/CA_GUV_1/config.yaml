@@ -1,0 +1,21 @@
+name: CA_GUV_1
+output: /workspace/morphoCT/benchmarks/results/foram_siccha/CA_GUV_1
+input:
+  path: /workspace/morphoCT_data/foram_siccha2023/CA_GUV_1_152x180x138-1.2016_um-ushort_LE.raw
+  shape:
+  - 138
+  - 180
+  - 152
+  dtype: uint16
+  byteorder: little
+  voxel_size: 1.2016
+foram:
+  close_radius: 8
+  seal_method: hull_enclosure
+  min_size: 64
+  largest_only: true
+  chambers: true
+  h_ratio: 0.2
+  smooth_sigma: 1.0
+  min_chamber_voxels: 80
+  wall_thickness_map: true

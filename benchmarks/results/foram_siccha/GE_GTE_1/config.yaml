@@ -1,0 +1,21 @@
+name: GE_GTE_1
+output: /workspace/morphoCT/benchmarks/results/foram_siccha/GE_GTE_1
+input:
+  path: /workspace/morphoCT_data/foram_siccha2023/GE_GTE_1_227x220x241-1.2004_um-ushort_LE.raw
+  shape:
+  - 241
+  - 220
+  - 227
+  dtype: uint16
+  byteorder: little
+  voxel_size: 1.2004
+foram:
+  close_radius: 8
+  seal_method: hull_enclosure
+  min_size: 64
+  largest_only: true
+  chambers: true
+  h_ratio: 0.2
+  smooth_sigma: 1.0
+  min_chamber_voxels: 80
+  wall_thickness_map: true
